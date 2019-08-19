@@ -1,7 +1,6 @@
 import re
 from pprint import pprint
 
-from django.db import IntegrityError
 from django.shortcuts import render
 
 from main.api import LingvoAPI
@@ -13,38 +12,38 @@ def index(request):
     api = LingvoAPI(LINGVO_API_KEY)
 
     # pprint(api.translation('spend'))
-    # pprint(api.minicard('ran'))  # ['Translation']['Translation'])
 
-    t = '''
-
-
->”Girls, we need to do something,” Fluttershy unexpectedly announces. “It’s about Anon.”
->The other five elements look up from the scrumptious picnic lunch laid out before them to their meek friend, making her shrink under the scrutiny.
->”What’s up with the big guy?” Rainbow asks the groups unspoken question with a raised eyebrow. “He doesn’t seem like the kind of guy to need a lot of help, really.”
->”W-well…” Fluttershy pauses to gather some courage, “haven’t you five noticed something about him? Well, um, it’s not really him, but rather his living conditions.”
->”Dear, Anon is quite the clean and organized individual. I don’t see how there could be something out of sorts with how he lives,” Rarity chimes in.
->”It’s not that, “ the yellow pegasus tries to explain, “you all know that he lives alone, right?”
->The five mares look to one another, slowly starting to piece together what they were being told.
->They all nod together.
->”And how it’s always been like that, for the last few months he’s lived here?”
->A slow, creeping sort of dread begins to form on the faces of Fluttershy’s friends.
->”As in, um…” Fluttershy swallows past the lump in her throat as her voice goes so quiet that the others almost don’t hear what she says.
->”... Throughout the night, too?”
->A suffocating silence overtakes the happy picnic, as horror runs through all the mares.
->”Y-you mean…” Applejack shakily starts, “Tha… tha poor guy has been sleepin’... ALONE... fur months!?!” The farmer almost yells.
-
-
+    t = '''\
+>Like a rock to a hornets nest, Applejack’s exclamation sets off her friends, who all erupt into their own laments over the resident human.
+>”Poor Anny! It must be so sc-!”
+>”T-t-this is an atrocity! An outrage!”
+>”What?! There’s no possible way that we didn’t notice for so long!”
+>”This is messed up! You can’t just-”
+>”Girls!” Fluttershy shouts, this time not shrinking away from the sudden attention.
+>She takes a deep breath and looks over all her friends. “I know this is a bad situation,” she says, her voice again soft, “but we shouldn’t sit here and panic. Anon needs us, and we need to figure out how to help him.”
+>All eyes immediately turn to Twilight for a plan, who smiles and pulls some paper and a quill from her saddlebags.
+>”Ok, I think I know just what we should do. First off…” 
 '''.lower()
-    words = re.findall(r'[a-z’\']+', t, flags=re.IGNORECASE)
-    for word in words:
+
+    def rep(m):
+        word = m.group(1)
+        # noinspection PyUnresolvedReferences
         try:
-            Word.objects.get(word=word)
+            # noinspection PyUnresolvedReferences
+            w = Word.objects.get(word=word)
         except Word.DoesNotExist:
             d = api.minicard(word)
-            if d:
-                print('{} ({})'.format(word, d['Translation']['Translation']))
-                Word(word=word, translation=d['Translation']['Translation']).save()
-            else:
-                print(word)
-                Word(word=word).save()
-    return ''
+            translation = d['Translation']['Translation'] if d else None
+            w = Word(word=word, translation=translation).save()
+
+        # print(word, translation)
+        if w.translation:
+            return '{word} <span style="color:#080" data-pk="{pk}">(<b>{tr}</b>)</span>'.format(
+                word=word, pk=w.pk, tr=w.translation)
+        return word
+
+    result = re.sub(r'([a-z’\']+)', rep, t)
+    result = result.replace('\n', '<br>')
+    return render(request, 'main/index.html', {
+        'text': result,
+    })
