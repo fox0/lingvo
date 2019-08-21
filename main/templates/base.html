@@ -3,9 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <title>Title</title>
-</head>
+    <link href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css" rel="stylesheet">
+    <script src="https://code.jquery.com/jquery-1.12.4.js"></script>
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+    /*
+  $( function() {
+    $( "#dialog-confirm" ).dialog({
+      resizable: false,
+      height: "auto",
+      width: 400,
+      modal: true,
+      buttons: {
+        "Delete all items": function() {
+          $( this ).dialog( "close" );
+        },
+        Cancel: function() {
+          $( this ).dialog( "close" );
+        }
+      }
+    });
+  } );
+*/
+    </script>
 
-<style>
+    <style>
 html {
     background: #aaa;
 }
@@ -17,9 +39,24 @@ body {
     font-size: 17px;
     line-height: 32px;
 }
-</style>
+.tr:hover {
+    text-decoration: underline dashed;
+    cursor: pointer;
+}
+.tr-new {
+    color: #080;
+}
+
+
+    </style>
+</head>
 
 <body>
+<div id="dialog-confirm" title="Empty the recycle bin?">
+  <p><span class="ui-icon ui-icon-alert" style="float:left; margin:12px 12px 20px 0;"></span>
+      These items will be permanently deleted and cannot be recovered. Are you sure?</p>
+</div>
+
 {% block content %}{% endblock %}
 </body>
 </html>

@@ -27,7 +27,7 @@ def index(request):
         word2 = _normalize(api, word)
         w = _translate(api, word2)
         if w.translation:
-            return '{word} <span style="color:#080" data-pk="{pk}">(<b>{tr}</b>)</span>'.format(
+            return '{word} <span class="tr tr-new" data-pk="{pk}">(<b>{tr}</b>)</span>'.format(
                 word=word, pk=w.pk, tr=w.translation)
         return word
 
